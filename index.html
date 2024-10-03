@@ -11,31 +11,31 @@
     <h1>Product Enhance API Test</h1>
     <form id="productForm" enctype="multipart/form-data">
         <label for="name">Name:</label>
-        <input type="text" id="name" name="name" required><br><br>
+        <input type="text" id="name" name="name"><br><br>
 
         <label for="brand">Brand:</label>
-        <input type="text" id="brand" name="brand" required><br><br>
+        <input type="text" id="brand" name="brand"><br><br>
 
         <label for="description">Description:</label>
-        <input type="text" id="description" name="description" required><br><br>
+        <input type="text" id="description" name="description"><br><br>
 
         <label for="category">Category:</label>
-        <input type="text" id="category" name="category" required><br><br>
+        <input type="text" id="category" name="category"><br><br>
 
         <label for="sub_Category">Sub Category:</label>
-        <input type="text" id="sub_Category" name="sub_Category" required><br><br>
+        <input type="text" id="sub_Category" name="sub_Category"><br><br>
 
         <label for="quantity">Quantity:</label>
-        <input type="number" id="quantity" name="quantity" required><br><br>
+        <input type="number" id="quantity" name="quantity"><br><br>
 
         <label for="price">Price:</label>
-        <input type="number" step="0.01" id="price" name="price" required><br><br>
+        <input type="number" step="0.01" id="price" name="price"><br><br>
 
         <label for="tags">Tags (comma-separated):</label>
-        <input type="text" id="tags" name="tags" required><br><br>
+        <input type="text" id="tags" name="tags"><br><br>
 
         <label for="images">Images:</label>
-        <input type="file" id="images" name="images" multiple required><br><br>
+        <input type="file" id="images" name="images" multiple><br><br>
 
         <button type="submit">Submit</button>
     </form>
@@ -48,19 +48,24 @@
             event.preventDefault();
 
             const formData = new FormData();
-            formData.append('name', document.getElementById('name').value);
-            formData.append('brand', document.getElementById('brand').value);
-            formData.append('description', document.getElementById('description').value);
-            formData.append('category', document.getElementById('category').value);
-            formData.append('sub_Category', document.getElementById('sub_Category').value);
-            formData.append('quantity', document.getElementById('quantity').value);
-            formData.append('price', document.getElementById('price').value);
 
-            // Split tags by commas and trim spaces
-            const tags = document.getElementById('tags').value.split(',').map(tag => tag.trim());
-            formData.append('tags', JSON.stringify(tags));
+            // Append the optional fields to FormData if they exist
+            const fields = ['name', 'brand', 'description', 'category', 'sub_Category', 'quantity', 'price', 'tags'];
+            fields.forEach(field => {
+                const value = document.getElementById(field).value;
+                if (value) {
+                    formData.append(field, value);
+                }
+            });
 
-            // Add all selected images to the form data
+            // Split tags by commas and trim spaces, then add if not empty
+            const tagsValue = document.getElementById('tags').value;
+            if (tagsValue) {
+                const tags = tagsValue.split(',').map(tag => tag.trim());
+                formData.append('tags', JSON.stringify(tags));
+            }
+
+            // Add all selected images to the form data (allowing multiple images)
             const images = document.getElementById('images').files;
             for (let i = 0; i < images.length; i++) {
                 formData.append('images', images[i]);
@@ -69,12 +74,8 @@
             try {
                 const response = await fetch('https://go-ecs-apigateway-alb-488335547.us-east-1.elb.amazonaws.com:5000/api/v1/product_enhance/', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(data),
+                    body: formData // FormData automatically sets the proper headers
                 });
-
 
                 if (!response.ok) {
                     throw new Error(`Error: ${response.statusText}`);
