@@ -76,6 +76,9 @@
                     method: 'POST',
                     body: formData, // FormData or JSON data
                     redirect: 'follow', // Follow redirects automatically
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    }
                 })
                     .then(response => {
                         if (!response.ok) {
