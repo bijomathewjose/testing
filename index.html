@@ -4,88 +4,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test Image Upload</title>
+    <title>API Test</title>
 </head>
 
 <body>
-    <h1>Test Lifestyle Shots API</h1>
-    <form id="imageForm" method="POST" enctype="multipart/form-data" action="/">
-        <label for="name">Product Name:</label><br>
-        <input type="text" id="name" name="name" placeholder="Enter product name" required><br><br>
-
-        <label for="brand">Brand:</label><br>
-        <input type="text" id="brand" name="brand" placeholder="Enter brand (optional)"><br><br>
-
-        <label for="description">Description:</label><br>
-        <input type="text" id="description" name="description" placeholder="Enter description (optional)"><br><br>
-
-        <label for="category">Category:</label><br>
-        <input type="text" id="category" name="category" placeholder="Enter category (optional)"><br><br>
-
-        <label for="quantity">Quantity:</label><br>
-        <input type="number" id="quantity" name="quantity" placeholder="Enter quantity (optional)"><br><br>
-
-        <label for="price">Price:</label><br>
-        <input type="text" id="price" name="price" placeholder="Enter price (optional)"><br><br>
-
-        <label for="tags">Tags (comma-separated):</label><br>
-        <input type="text" id="tags" name="tags" placeholder="Enter tags (optional)"><br><br>
-
-        <label for="images">Upload Image:</label><br>
-        <input type="file" id="images" name="images" accept="image/*" required><br><br>
-
-        <input type="submit" value="Upload Image">
-    </form>
+    <h1>Test Product Enhance API</h1>
     <div id="response"></div>
-    <div id="resImage"></div>
-    <div id="response2"></div>
-    <div id="resImage2"></div>
-
-    <div id="response3"></div>
-    <div id="resImage3"></div>
+    <button onclick="testApi()">Send POST Request</button>
 
     <script>
-        const form = document.getElementById('imageForm');
-        const responseDiv = document.getElementById('response');
-        const responseDiv2 = document.getElementById('response2');
-        const imageDiv = document.getElementById('resImage');
-        const imageDiv2 = document.getElementById('resImage2');
-        form.addEventListener('submit', async (event) => {
-            event.preventDefault();
+        function testApi() {
+            const url = 'https://python-dev.goigo.co.in/api/v1/product_enhance';
+            const formData = new FormData();
 
-            const formData = new FormData(form);
+            // Product data
+            formData.append('name', "HERSHEY'S Caramel Flavored Syrup | Delicious Caramel Flavor | 623 Gm Bottle");
+            formData.append('brand', 'hersheys');
+            formData.append('description', "HERSHEY'S Caramel Flavored Syrup | Delicious Caramel Flavor | 623 Gm Bottle");
+            formData.append('category', 'layer_A+');
+            formData.append('sub_category', 'hersheys');
+            formData.append('quantity', '82');
+            formData.append('price', '179');
+            formData.append('sku_id', 's5_1727673066406585');
+            formData.append('tags', 'hersheys');
 
-            try {
-                // Perform all three fetch requests in parallel using Promise.all
-                const [result1, result2, result3] = await Promise.all([
-                    fetch('https://dev-python.goigo.co.in/api/v1/lifestyle_shots_image', {
-                        method: 'POST',
-                        body: formData
-                    }).then(response => response.json()),
+            // Image URLs
+            const imageUrls = [
+                "https://igo-media-dev.s3.amazonaws.com/igo_files/bgremove_outs/1729576967381_54316.jpg",
+                "https://igo-media-dev.s3.amazonaws.com/igo_files/bgremove_outs/1729576969205_93727.jpg",
+                "https://igo-media-dev.s3.amazonaws.com/igo_files/bgremove_outs/1729576971283_18975.jpg",
+                "https://igo-media-dev.s3.amazonaws.com/igo_files/bgremove_outs/1729576973831_60450.jpg"
+            ];
+            imageUrls.forEach(url => formData.append('imageurls', url));
 
-                    fetch('https://dev-python.goigo.co.in/api/v1/lifestyle_shots_image', {
-                        method: 'POST',
-                        body: formData
-                    }).then(response => response.json()),
-
-                ]);
-
-                // Display the results in the respective divs
-                responseDiv.innerHTML = `<pre>${JSON.stringify(result1, null, 2)}</pre>`;
-                imageDiv.innerHTML = `
-                ${result1.data.images.output.map((image) => `<img src="${image}" alt="Uploaded Image" width="200" height="200">`).join('')}`
-                responseDiv2.innerHTML = `<pre>${JSON.stringify(result2, null, 2)}</pre>`;
-                imageDiv2.innerHTML = `
-                ${result2.data.images.output.map((image) => `<img src="${image}" alt="Uploaded Image" width="200" height="200">`).join('')}`
-
-            } catch (error) {
-                // Handle errors for all the requests
-                responseDiv.innerHTML = `<pre>Error: ${error.message}</pre>`;
-                responseDiv2.innerHTML = `<pre>Error: ${error.message}</pre>`;
-            }
-        });
+            // Send the POST request
+            fetch(url, {
+                method: 'POST',
+                body: formData,
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Response:', data);
+                    document.getElementById('response').innerHTML = JSON.stringify(data, null, 2);
+                })
+                .catch(error => console.error('Error:', error));
+        }
     </script>
-
 </body>
 
 </html>
